@@ -1,0 +1,6 @@
+*.old
+*.oold
+*.retry
+*.tar
+.vault-password-file
+ansible/roles/swarm-stack/files/generated/
