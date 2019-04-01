@@ -1,0 +1,8 @@
+# User specific aliases and functions
+export PATH=$PATH:$HOME/git/...
+set -o vi
+alias la='ls -al'
+alias gitlog='git log --format="%h %cn %ai %s"'
+. $HOME/git/.../lolo_docker_aliases.sh
+source /usr/share/git-core/contrib/completion/git-prompt.sh
+export PS1='\[\033[1;32m\][\u@\h \w]\[\033[0;0m\] $(__git_ps1 " (%s)")\$ '
