@@ -5,15 +5,11 @@
 
 while getopts "f:m:h:?" opt; do
   case $opt in
-    f)
-      FILTRE=$OPTARG ;;
-    m)
-      ANC=${OPTARG}m ;;
-    h)
-      ANC=${OPTARG}h ;;
-    *)
-      echo "Usage: dklog.sh -f <nom partiel des conteneurs> [ -m <nb de minutes> | -h <nb d'heures> (defaut: 5m avec suivi) ]" >&2
-      exit 1 ;;
+  f) FILTRE=$OPTARG ;;
+  m) ANC=${OPTARG}m ;;
+  h) ANC=${OPTARG}h ;;
+  *) echo "Usage: dklog.sh -f <nom partiel des conteneurs> [ -m <nb de minutes> | -h <nb d'heures> (defaut: 5m avec suivi) ]" >&2
+     exit 1 ;;
   esac
 done
 
