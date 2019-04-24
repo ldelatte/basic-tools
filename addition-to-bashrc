@@ -6,3 +6,10 @@ alias gitlog='git log --format="%h %cn %ai %s"'
 . $HOME/git/.../lolo_docker_aliases.sh
 source /usr/share/git-core/contrib/completion/git-prompt.sh
 export PS1='\[\033[1;32m\][\u@\h \w]\[\033[0;0m\] $(__git_ps1 " (%s)")\$ '
+
+## ip_proxy=10.1.1.1
+## http_proxy=http://$ip_proxy:8080
+## https_proxy=$http_proxy
+## HTTP_PROXY=$http_proxy
+## no_proxy="localhost,127.0.0.1,.localdomain.com"
+## export ip_proxy http_proxy https_proxy HTTP_PROXY no_proxy
