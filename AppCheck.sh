@@ -1,6 +1,6 @@
 #!/bin/bash
 # objet: Verifie le nombre des conteneurs et des processus sur la plate-forme
-# creation: Laurent Delatte, 2018
+# creation: Laurent Delatte, 07/2018
 # maj: ...
 # args:
 #       debug
