@@ -62,7 +62,7 @@ else
     cat <<EOF >/tmp/AppCheck.txt
 From: $SMTPFROM
 To: $( echo $SMTPDEST |sed -e 's/--mail-rcpt \([^ ]*\) /\1,/g' -e 's/--mail-rcpt \([^ ]*\)$/\1/' )
-Subject: [Supervision CityStore] Alarme du service interne de supervision
+Subject: [Supervision] Alarme du service interne de supervision
 Content-Type: text/html; charset="utf8"
 <html><body>
 EOF
