@@ -1,53 +1,72 @@
 #!/bin/sh
-# objet: Verifie le nombre des conteneurs et des processus sur la plate-forme
-# creation: Laurent Delatte, 07/2018
-# maj: ajout parametres, 04/2019
-# args:
-#       debug
-#       rec     : alternative inventory
-#       distrib : to distribute AppCheck config files on remote VMs
+# objet: Verifie le nombre des conteneurs, des processus sur la plate-forme ou d'autres valeurs
+# creation:     07/2018 Laurent Delatte
+# modification: 04/2019 ajout parametres et envoi de mail
+# args:  debug   : use test check inventory
+#        int|rct : use alternative check inventory
+#        distrib : to distribute AppCheck config files on remote VMs
+# env:   for "-m" option only:  AppCheck.user file and SMTP* need configuration
 
-BIN=/usr/local/bin
-ETC=/usr/local/etc
+BIN=.
+ETC=.
+
+[ "$LOGTAG" ] || LOGTAG=AppCheck
 NbChn=2
 distrib=0
-fichier=prd.AppCheckIn
-while getopts "e:d?" opt; do
+config=prd.AppCheckIn
+while getopts "e:dm?" opt; do
   case $opt in
   e) case $OPTARG in
-     "debug") fichier=ppp.AppCheckIn ;;
-     "dev"|"int"|"rct"|"prd") fichier=$OPTARG.AppCheckIn ;;
+     "debug") config=debug.AppCheckIn ;;
+     "dev"|"int"|"rct"|"prd") config=$OPTARG.AppCheckIn ;;
      *) $0 -?
         exit 1 ;;
      esac ;;
   d) distrib=1 ;;
-  *) echo "Usage: AppCheck.sh -e debug|dev|int|rct|prd> [ -d pour distribuer ]" >&2
+  m) mail=1 ;;
+  *) echo "Usage: AppCheck.sh -e debug|dev|int|rct|prd> [ -m pour un format mail ] [ -d pour distribuer ]" >&2
      exit 1 ;;
   esac
 done
-[ -f $fichier ] || { echo "fichier de configuration $fichier absent" >&2; exit 1; }
+[ -f $config ] || { echo "fichier de configuration $config absent" >&2; exit 1; }
 
 cd $BIN
 if [ $distrib == 1 ] ;then
-  grep -v "^#" $ETC/$fichier |
+  grep -v "^#" $ETC/$config |
   while read h l a c ;do
     [ $h == localhost ] && continue
-    echo "ssh $h \"echo '# AppCheck config file' >$ETC/$fichier\""
+    echo "ssh $h \"echo '# AppCheck config file' >$ETC/$config\""
     echo "scp AppCheck.sh $h:$BIN/"
   done >/tmp/AppCheck.tmp
   bash /tmp/AppCheck.tmp
 fi
 
-grep -v "^#" $ETC/$fichier |
+grep -v "^#" $ETC/$config |
 while read h l a c ;do
   if [ $distrib == 1 ] ;then
     [ $h == localhost ] && continue
-    echo "ssh $h \"echo 'localhost $l $a $c' >>$ETC/$fichier\""
+    echo "ssh $h \"echo 'localhost $l $a $c' >>$ETC/$config\""
   else
     [ "$h" == "localhost" ] && echo r="\`$c\`" || echo r="\`ssh $h $c\`"
-    [ "$h" == "localhost" ] && sortie='logger -s -t AppCheck' || sortie=echo
+    [ "$h" == "localhost" ] && sortie="logger -s -t $LOGTAG" || sortie=echo
     echo "[ \$r == $a ] || $sortie \"ERROR: Nombre d elements $l incorrect sur $h (\$r/$a)\""
   fi
 done >/tmp/AppCheck.tmp
 sed -i s/\$NbChn/$NbChn/g /tmp/AppCheck.tmp
-sh /tmp/AppCheck.tmp
+if [ "$mail" != 1 ] ;then
+  sh /tmp/AppCheck.tmp 2>&1
+else
+  sh /tmp/AppCheck.tmp >/dev/null 2>/tmp/AppCheck.log
+  cat /tmp/AppCheck.log >&2
+  if [ `cat /tmp/AppCheck.log|wc -l` -gt 0 ] ;then
+    cat <<EOF >/tmp/AppCheck.txt
+From: $SMTPFROM
+To: $( echo $SMTPDEST |sed -e 's/--mail-rcpt \([^ ]*\) /\1,/g' -e 's/--mail-rcpt \([^ ]*\)$/\1/' )
+Subject: [Supervision CityStore] Alarme du service interne de supervision
+Content-Type: text/html; charset="utf8"
+<html><body>
+EOF
+    cat /tmp/AppCheck.log >>/tmp/AppCheck.txt
+    curl -s --url smtp://$SMTPHOST --user "$(cat $ETC/AppCheck.user)" --mail-from "$SMTPFROM" $SMTPDEST --upload-file /tmp/AppCheck.txt
+  fi
+fi
