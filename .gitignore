@@ -1,6 +1,42 @@
 *.old
 *.oold
-*.retry
+*.sv
+*.ssv
+*.nv
+*.nnv
+*.log
+**/logs/
+**/*.old/
+*.secret.*
 *.tar
-.vault-password-file
-ansible/roles/swarm-stack/files/generated/
+*.gz
+*.tgz
+*.rar
+*.iso
+# git:
+.gitignore*
+# ansible:
+*.retry
+.vault-password-file*
+#  terraform:
+**/.terraform/
+*.tfstate*
+# .out files
+*.out
+# python:
+**/.python_packages/
+.env
+.venv
+**/env/
+**/venv/
+**/ENV/
+**/env.bak/
+**/venv.bak/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.python-version
+# Flask stuff:
+instance/
+.webassets-cache
