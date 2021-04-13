@@ -1,14 +1,16 @@
 [user]
-        name = ...
-        email = ...
+        name = "L. Delatte"
+        email = nobody@nowhere
 [http]
         proxy = http://proxy...:8080
         sslCAInfo = /home/...
         sslCert = /home/...
         sslKey = /home/...
         sslVerify = false
+[core]
+        editor = vi
 [merge]
-        tool = /bin/vimdiff
+        tool = vimdiff
 [push]
         default = simple
 [alias]
