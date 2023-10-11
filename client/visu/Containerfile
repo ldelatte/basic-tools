@@ -1,0 +1,15 @@
+FROM docker.io/library/python:3.11.6-alpine3.18
+RUN apk --no-cache add curl
+RUN addgroup -g 1000 user    && adduser -G user -D -u 1000 user && \
+    mkdir -p -m 770 /home/user/.cache/matplotlib /home/user/.config/matplotlib && \
+    chgrp user /home/user/.cache/matplotlib /home/user/.config/matplotlib
+VOLUME /home/user/donnees
+EXPOSE 8988
+RUN pip install --no-cache-dir matplotlib numpy tornado requests boto3 beautifulsoup4
+COPY --chmod=644 HOME__config_matplotlib_matplotlibrc /home/user/.config/matplotlib/matplotlibrc
+COPY --chown=0:1000 --chmod=750 src /home/user/bin
+USER user
+# ENV HOME=/home/user
+WORKDIR /home/user/bin
+# ENTRYPOINT ["python3"]
+CMD ["python3"]
