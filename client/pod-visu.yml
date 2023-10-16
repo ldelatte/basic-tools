@@ -33,12 +33,7 @@ spec:
     command:
     - python3
     args:
-    ## - suivi.py
-    - indices.py
-    - yy
-    ## - -m
-    ## - http.server
-    ## - 8988
+    - suivi.py
     resources:
       requests:
         mem: 50M
@@ -62,9 +57,10 @@ spec:
       seccompProfile:
         type:
       seLinuxOptions:
-        type:
         user:
         role:
+        type:
+        level: "s0:c123,c456"
       procMount:
       sysctls:
         name:
